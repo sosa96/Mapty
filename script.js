@@ -11,7 +11,6 @@ const inputElevation = document.querySelector('.form__input--elevation');
 class Workout {
   date = new Date();
   id = (Date.now() + '').slice(-10);
-  clicks = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords; // [lat,lng]
@@ -26,10 +25,6 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
-  }
-
-  click() {
-    this.clicks++;
   }
 }
 
@@ -77,8 +72,13 @@ class App {
 
   constructor() {
     // Constructor gets called when script loads
+    // Get users position
     this._getPosition();
 
+    // Get data from local storage
+    this._getLocalStorage();
+
+    // Attach event handllers
     form.addEventListener('submit', this._newWorkout.bind(this));
     // Bind because event listener points this keyword to form element not app object
 
@@ -114,6 +114,11 @@ class App {
 
       // Handling clicks on map
       this.#map.on('click', this._showForm.bind(this));
+
+      // Load local stored marker when map is loaded
+      this.#workouts.forEach(work => {
+        this._renderWorkoutMarker(work);
+      });
     }
   }
 
@@ -193,6 +198,9 @@ class App {
 
     // Hide form + clear input fields
     this._hideForm();
+
+    // Set local storage to all workouts
+    this._setLocalStorage();
   }
 
   _renderWorkoutMarker(workout) {
@@ -279,9 +287,27 @@ class App {
         duration: 1,
       },
     });
+  }
 
-    // Using the public interface
-    workout.click();
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts)); // accepts string
+  }
+
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts')); // back to object
+
+    if (!data) return;
+
+    this.#workouts = data;
+
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
