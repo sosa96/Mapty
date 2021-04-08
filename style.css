@@ -171,6 +171,30 @@ a:visited {
   display: none;
 }
 
+.delete-btn {
+  color: var(--color-light--2);
+  background-color: var(--color-dark--2);
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  border-left: 5px solid #ce3812;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+}
+
+.delete-btn.hidden {
+  display: none;
+}
+
+.close-icon {
+  fill: var(--color-light--2);
+  font-size: 16px;
+  grid-column: 4;
+  justify-self: self-end;
+}
+
 .copyright {
   margin-top: auto;
   font-size: 1.3rem;

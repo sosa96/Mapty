@@ -7,6 +7,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const deleteAllBtn = document.querySelector('.delete-btn');
 
 class Workout {
   date = new Date();
@@ -85,6 +86,13 @@ class App {
     inputType.addEventListener('change', this._toggleElevationField);
 
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+
+    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
+
+    containerWorkouts.addEventListener(
+      'click',
+      this._deleteAllWorkout.bind(this)
+    );
   }
 
   _getPosition() {
@@ -224,6 +232,7 @@ class App {
   _renderWorkout(workout) {
     let html = `
     <li class="workout workout--${workout.type}" data-id="${workout.id}">
+    <i class="fas fa-times-circle close-icon" data-id="${workout.id}"></i>
           <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${
@@ -270,6 +279,7 @@ class App {
     `;
 
     form.insertAdjacentHTML('afterend', html);
+    deleteAllBtn.classList.remove('hidden');
   }
 
   _moveToPopup(e) {
@@ -287,6 +297,29 @@ class App {
         duration: 1,
       },
     });
+  }
+
+  _deleteWorkout(e) {
+    const closeEl = e.target.closest('.close-icon');
+    if (!closeEl) return;
+    const workout = this.#workouts.find(work => work.id === closeEl.dataset.id);
+    const workoutEl = e.target.closest('.workout');
+
+    workoutEl.style.display = 'none';
+    this.#workouts.pop(workout);
+    this._setLocalStorage();
+    location.reload();
+  }
+
+  _deleteAllWorkout(e) {
+    const deleteBtnEl = e.target.closest('.delete-btn');
+    if (!deleteBtnEl) return;
+    containerWorkouts.style.display = 'none';
+    while (this.#workouts.length) {
+      this.#workouts.pop();
+    }
+    this._setLocalStorage();
+    location.reload();
   }
 
   _setLocalStorage() {
